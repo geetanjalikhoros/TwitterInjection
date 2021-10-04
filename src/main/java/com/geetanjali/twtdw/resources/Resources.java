@@ -26,19 +26,28 @@ import org.slf4j.Marker;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
 
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.xml.XmlBeanFactory;
+import org.springframework.core.io.*;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+
 @Path("/api/1.0/twitter")
 @Produces(MediaType.APPLICATION_JSON)
-public class Resource {
+public class Resources {
     private final String message;
-    private RetrieveTweets twt;
-    private PostTweets ptwt;
     private Twitter twitter;
+    BeanFactory factory;
+    PostTweets ptwt;
+    RetrieveTweets twt;
 
-    public Resource(String message) {
+    public Resources(String message) {
         this.message = message;
         this.twitter = TwitterFactory.getSingleton();
-        this.twt = new RetrieveTweets();
-        this.ptwt = new PostTweets();
+
+        factory=new XmlBeanFactory(new FileSystemResource("applicationContext.xml"));
+        ptwt=(PostTweets) factory.getBean("ptwt");
+        twt=(RetrieveTweets) factory.getBean("twt");
     }
 
     @Path("/timeline")
